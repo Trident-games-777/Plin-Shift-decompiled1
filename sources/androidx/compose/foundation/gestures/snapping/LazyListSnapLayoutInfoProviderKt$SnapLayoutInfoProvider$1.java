@@ -1,0 +1,63 @@
+package androidx.compose.foundation.gestures.snapping;
+
+import androidx.compose.foundation.lazy.LazyListItemInfo;
+import androidx.compose.foundation.lazy.LazyListLayoutInfo;
+import androidx.compose.foundation.lazy.LazyListState;
+import java.util.List;
+import kotlin.Metadata;
+import kotlin.ranges.RangesKt;
+
+@Metadata(d1 = {"\u0000#\n\u0000\n\u0002\u0018\u0002\n\u0000\n\u0002\u0010\b\n\u0002\b\u0003\n\u0002\u0018\u0002\n\u0002\b\u0003\n\u0002\u0010\u0007\n\u0002\b\u0004*\u0001\u0000\b\n\u0018\u00002\u00020\u0001J\u0018\u0010\n\u001a\u00020\u000b2\u0006\u0010\f\u001a\u00020\u000b2\u0006\u0010\r\u001a\u00020\u000bH\u0016J\u0010\u0010\u000e\u001a\u00020\u000b2\u0006\u0010\f\u001a\u00020\u000bH\u0016R\u0014\u0010\u0002\u001a\u00020\u00038BX\u0004¢\u0006\u0006\u001a\u0004\b\u0004\u0010\u0005R\u0014\u0010\u0006\u001a\u00020\u00078BX\u0004¢\u0006\u0006\u001a\u0004\b\b\u0010\t¨\u0006\u000f"}, d2 = {"androidx/compose/foundation/gestures/snapping/LazyListSnapLayoutInfoProviderKt$SnapLayoutInfoProvider$1", "Landroidx/compose/foundation/gestures/snapping/SnapLayoutInfoProvider;", "averageItemSize", "", "getAverageItemSize", "()I", "layoutInfo", "Landroidx/compose/foundation/lazy/LazyListLayoutInfo;", "getLayoutInfo", "()Landroidx/compose/foundation/lazy/LazyListLayoutInfo;", "calculateApproachOffset", "", "velocity", "decayOffset", "calculateSnapOffset", "foundation_release"}, k = 1, mv = {1, 8, 0}, xi = 48)
+/* compiled from: LazyListSnapLayoutInfoProvider.kt */
+public final class LazyListSnapLayoutInfoProviderKt$SnapLayoutInfoProvider$1 implements SnapLayoutInfoProvider {
+    final /* synthetic */ LazyListState $lazyListState;
+    final /* synthetic */ SnapPosition $snapPosition;
+
+    LazyListSnapLayoutInfoProviderKt$SnapLayoutInfoProvider$1(LazyListState lazyListState, SnapPosition snapPosition) {
+        this.$lazyListState = lazyListState;
+        this.$snapPosition = snapPosition;
+    }
+
+    private final LazyListLayoutInfo getLayoutInfo() {
+        return this.$lazyListState.getLayoutInfo();
+    }
+
+    private final int getAverageItemSize() {
+        LazyListLayoutInfo layoutInfo = getLayoutInfo();
+        int i = 0;
+        if (layoutInfo.getVisibleItemsInfo().isEmpty()) {
+            return 0;
+        }
+        int size = layoutInfo.getVisibleItemsInfo().size();
+        for (LazyListItemInfo size2 : layoutInfo.getVisibleItemsInfo()) {
+            i += size2.getSize();
+        }
+        return i / size;
+    }
+
+    public float calculateApproachOffset(float f, float f2) {
+        return RangesKt.coerceAtLeast(Math.abs(f2) - ((float) getAverageItemSize()), 0.0f) * Math.signum(f2);
+    }
+
+    public float calculateSnapOffset(float f) {
+        List<LazyListItemInfo> visibleItemsInfo = getLayoutInfo().getVisibleItemsInfo();
+        SnapPosition snapPosition = this.$snapPosition;
+        int size = visibleItemsInfo.size();
+        float f2 = Float.NEGATIVE_INFINITY;
+        float f3 = Float.POSITIVE_INFINITY;
+        for (int i = 0; i < size; i++) {
+            int singleAxisViewportSize = LazyListSnapLayoutInfoProviderKt.getSingleAxisViewportSize(getLayoutInfo());
+            int beforeContentPadding = getLayoutInfo().getBeforeContentPadding();
+            LazyListItemInfo lazyListItemInfo = visibleItemsInfo.get(i);
+            LazyListItemInfo lazyListItemInfo2 = lazyListItemInfo;
+            float calculateDistanceToDesiredSnapPosition = SnapPositionKt.calculateDistanceToDesiredSnapPosition(singleAxisViewportSize, beforeContentPadding, getLayoutInfo().getAfterContentPadding(), lazyListItemInfo.getSize(), lazyListItemInfo2.getOffset(), lazyListItemInfo2.getIndex(), snapPosition, getLayoutInfo().getTotalItemsCount());
+            if (calculateDistanceToDesiredSnapPosition <= 0.0f && calculateDistanceToDesiredSnapPosition > f2) {
+                f2 = calculateDistanceToDesiredSnapPosition;
+            }
+            if (calculateDistanceToDesiredSnapPosition >= 0.0f && calculateDistanceToDesiredSnapPosition < f3) {
+                f3 = calculateDistanceToDesiredSnapPosition;
+            }
+        }
+        return SnapFlingBehaviorKt.m587calculateFinalOffsetFhqu1e0(LazyListSnapLayoutInfoProviderKt.calculateFinalSnappingItem(this.$lazyListState.getDensity$foundation_release(), f), f2, f3);
+    }
+}
